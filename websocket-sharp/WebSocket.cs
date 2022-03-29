@@ -325,6 +325,8 @@ namespace WebSocketSharp
         return _readyState == WebSocketState.Open || _readyState == WebSocketState.Closing;
       }
     }
+    
+    public IEnumerable<KeyValuePair<string, string>> CustomHeaders { get; set; }
 
     #endregion
 
@@ -1992,6 +1994,15 @@ namespace WebSocketSharp
     private HttpResponse sendHandshakeRequest ()
     {
       var req = createHandshakeRequest ();
+      
+      if (this.CustomHeaders != null)
+      {
+        foreach (KeyValuePair<string, string> customHeader in this.CustomHeaders)
+        {
+          req.Headers.Set(customHeader.Key, customHeader.Value);
+        }
+      }
+      
       var res = sendHttpRequest (req, 90000);
       if (res.IsUnauthorized) {
         var chal = res.Headers["WWW-Authenticate"];
